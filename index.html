@@ -1,13 +1,33 @@
 <!DOCTYPE html>
-<head>
-	<script type="text/javascript">
-		window.onload = function(evt) {
-			var par = document.createElement('p');
-			par.innerHTML = 'ADDRESS IS: ' + window.location.href;
-			document.getElementsByTagName("body")[0].appendChild(par);
-		}
-	</script>
-</head>
-<h1>CRRRO</h1>
-<a href="testing">testing</a>
-<a href="besting">besting</a>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <script src='sql-wasm.js'></script>
+		<script src="wasm_exec.js"></script>
+        <script>
+	    	const go = new Go();
+			wasm_promise = WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject)
+			initSqlJs().then(function(SQL){
+				console.log("sql js inited");
+				window.db = new SQL.Database();
+
+	    		wasm_promise.then((result) => {
+					console.log("go wasm promise promised");
+	    		    go.run(result.instance);
+	    		});
+		    });
+        </script>
+		<script type="text/javascript">
+			window.onload = function(evt) {
+				var par = document.createElement('p');
+				par.innerHTML = 'ADDRESS IS: ' + window.location.href;
+				document.getElementsByTagName("body")[0].appendChild(par);
+			}
+		</script>
+    </head>
+    <body>
+		<h1>CRRRO</h1>
+		<a href="testing">testing</a>
+		<a href="besting">besting</a>
+	</body>
+</html>
