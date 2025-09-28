@@ -5,6 +5,8 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"net/url"
+	"strings"
 	"log"
 	"regexp"
 	"syscall/js"
@@ -45,29 +47,51 @@ func parseCommand(source string) (Command, bool) {
 var init_sql string
 
 func main() {
+	window := js.Global().Get("window")
 	db := js.Global().Get("db")
 	db.Call("run", init_sql)
+	
+	location := window.Get("location").Get("href").String()
+	if strings.Contains(location, "?") {
+		u, err := url.Parse(location)
+		if err != nil {
+		    panic(err)
+		}
+		query, err := url.QueryUnescape(u.RawQuery)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if strings.HasPrefix(query, "/") {
+			query = query[1:]
+		}
+		FeedMessageToCarrotson(db, query)
+	}
 
-	db.Call("run", "BEGIN;")
-	db.Call("run", "INSERT INTO Carrotson_Branches (context, follows, frequency) VALUES (?, ?, 1) ON CONFLICT (context, follows) DO UPDATE SET frequency = Carrotson_Branches.frequency + 1;", []any{"WOAH", "ASS AHOY"})
-	db.Call("run", "COMMIT;")
 	FeedMessageToCarrotson(db, "HELLO")
 	FeedMessageToCarrotson(db, "HELP")
 	FeedMessageToCarrotson(db, "HELL")
 	FeedMessageToCarrotson(db, "HELLO KITTY")
 	FeedMessageToCarrotson(db, "HELLO WORLD")
 
-	JSON := js.Global().Get("JSON")
-	stmt := db.Call("prepare", "SELECT * FROM Carrotson_Branches")
-	for stmt.Call("step").Bool() {
-		row := stmt.Call("getAsObject");
-		fmt.Println("Here is a row: " + JSON.Call("stringify", row).String())
-	}
+	// JSON := js.Global().Get("JSON")
+	// Stmt := db.Call("prepare", "SELECT * FROM Carrotson_Branches")
+	// For stmt.Call("step").Bool() {
+	// 	row := stmt.Call("getAsObject");
+	// 	fmt.Println("Here is a row: " + JSON.Call("stringify", row).String())
+	// }
 
-	message, err := CarrotsonGenerate(db, "HEL", 256)
+	// message, err := CarrotsonGenerate(db, "HEL", 256)
+	message, err := CarrotsonGenerate(db, "", 256)
 	if err != nil {
 		log.Printf("%s\n", err)
 		return
 	}
 	fmt.Println(maskDiscordPings(message))
+
+	document := js.Global().Get("document")
+	par := document.Call("createElement", "p")
+	par.Set("innerHTML", "CARROT SAYS: " + maskDiscordPings(message))
+	document.Call("getElementsByTagName", "body").Index(0).Call("appendChild", par)
+	
+	select {}
 }
