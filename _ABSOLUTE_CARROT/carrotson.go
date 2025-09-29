@@ -38,7 +38,7 @@ var (
 )
 
 func QueryRandomBranchFromUnfinishedContext(db js.Value, context []rune) (*Branch, error) {
-	rows := db.Call("exec", "SELECT context, follows, frequency FROM Carrotson_Branches WHERE context LIKE ? AND frequency > 0 ORDER BY random() LIMIT 1", []any{string(context)+"%"})
+	rows := db.Call("exec", "SELECT context, follows, frequency FROM Carrotson_Branches WHERE context LIKE ? AND frequency > 0 ORDER BY random() LIMIT 1", []any{string(context) + "%"})
 	row := rows.Index(0)
 	if row.IsNull() || row.IsUndefined() {
 		return nil, nil
@@ -67,7 +67,7 @@ func QueryRandomBranchFromContext(db js.Value, context []rune, t float64) (*Bran
 	values := row.Get("values").Index(0)
 	var follows string = values.Index(0).String()
 	var frequency int64 = int64(values.Index(1).Int())
-		
+
 	if len(follows) == 0 {
 		return nil, EmptyFollowsError
 	}
