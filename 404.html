@@ -1,41 +1,86 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Single Page Apps for GitHub Pages</title>
-    <script type="text/javascript">
-      // Single Page Apps for GitHub Pages
-      // MIT License
-      // https://github.com/rafgraph/spa-github-pages
-      // This script takes the current url and converts the path and query
-      // string into just a query string, and then redirects the browser
-      // to the new url with only a query string and hash fragment,
-      // e.g. https://www.foo.tld/one/two?a=b&c=d#qwe, becomes
-      // https://www.foo.tld/?/one/two&a=b~and~c=d#qwe
-      // Note: this 404.html file must be at least 512 bytes for it to work
-      // with Internet Explorer (it is currently > 512 bytes)
+<html style="background-color: #1c5c2c">
+    <head>
+        <meta charset="utf-8"/>
+        <script src='sql-wasm.js'></script>
+		<script src="wasm_exec.js"></script>
+		<!-- <script src="tinygo_wasm_exec.js"></script> -->
+        <script>
+	    	const go = new Go();
+			wasm_promise = WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject)
+			
 
-      // If you're creating a Project Pages site and NOT using a custom domain,
-      // then set pathSegmentsToKeep to 1 (enterprise users may need to set it to > 1).
-      // This way the code will only replace the route part of the path, and not
-      // the real directory in which the app resides, for example:
-      // https://username.github.io/repo-name/one/two?a=b&c=d#qwe becomes
-      // https://username.github.io/repo-name/?/one/two&a=b~and~c=d#qwe
-      // Otherwise, leave pathSegmentsToKeep as 0.
-      var pathSegmentsToKeep = 0;
+			window.db_promise = initSqlJs().then(function(SQL){
+				window.db = new SQL.Database();
+				console.log("db set");
+				wasm_promise.then((result) => {
+					console.log("wasm promise: go run started");
+	    	    	go.run(result.instance);
+					food = decodeURI(window.location.pathname.slice(1,))
+					window.feed_carrot(food)
 
-      var l = window.location;
-      l.replace(
-        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
-        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
-        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-        l.hash
-      );
+					canvas = document.querySelector('#main');
+					ctx = canvas.getContext('2d', {alpha: false})
+					
+					rectX = 30
+					rectY = 30
+					rectWidth = 250
+					rectHeight = 170
+					
+					ctx.fillStyle = "#000"
+					ctx.font = "24px sans"
+					ctx.textAlign = "center"
+					ctx.textBaseline = "middle"
+					ctx.fillText(window.carrot_generate(), rectX+(rectWidth/2),rectY+(rectHeight/2))
 
-    </script>
-  </head>
-  <body>
-  </body>
+
+				});
+				console.log("sql-js inited");
+			})
+
+			window.onload = function () {
+				console.log("ONLOAD");
+				canvas = document.querySelector('#main');
+				ctx = canvas.getContext('2d', {alpha: false})
+		
+				const width = 600
+				const height = 400
+		
+				ctx.fillStyle = '#00c3ff'
+				ctx.fillRect(0, 0, width, height*0.7)
+				ctx.fillStyle = '#9d582e'
+				ctx.fillRect(0, height*0.7, width, height)
+				
+				ctx.drawImage(carrot_svg, 200, 50)
+				ctx.drawImage(happy_mouth, 340, 145, 345/2.8, 345/2.8)
+
+				rectX = 30
+				rectY = 30
+				rectWidth = 250
+				rectHeight = 170
+				ctx.fillStyle = '#ececbc'
+				ctx.beginPath()
+				ctx.roundRect(rectX, rectY, rectWidth, rectHeight, 40)
+				ctx.closePath()
+				ctx.fill()
+
+				ctx.beginPath()
+				ctx.moveTo(270, 180)
+				ctx.lineTo(330, 190)
+				ctx.lineTo(270, 150)
+				ctx.closePath()
+				ctx.fill()
+			}
+        </script>
+    </head>
+    <body>
+		<h1>!carrot HAPPY CARROT DAY</h1>
+		<a href="testing">testing</a>
+		<a href="besting">besting</a>
+		<a href="🤝 HANDS SHAKEN">🤝 HANDS SHAKEN</a>
+        <p id="message"></p>
+        <canvas id="main" width="600" height="400" style="background:black"></canvas>
+		<img id="carrot_svg" src="images/carrot.svg" style="display:none">
+		<img id="happy_mouth" src="images/happy_mouth.png" style="display:none">
+	</body>
 </html>
-

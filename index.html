@@ -1,19 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html style="background-color: #1c5c2c">
     <head>
         <meta charset="utf-8"/>
         <script src='sql-wasm.js'></script>
 		<script src="wasm_exec.js"></script>
+		<!-- <script src="tinygo_wasm_exec.js"></script> -->
         <script>
 	    	const go = new Go();
 			wasm_promise = WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject)
-			initSqlJs().then(function(SQL){
-				window.db = new SQL.Database();
+			
 
-	    		wasm_promise.then((result) => {
-	    		    go.run(result.instance);
-	    		});
-		    });
+			window.db_promise = initSqlJs().then(function(SQL){
+				window.db = new SQL.Database();
+				console.log("db set");
+				wasm_promise.then((result) => {
+					console.log("wasm promise: go run started");
+	    	    	go.run(result.instance);
+					food = decodeURI(window.location.pathname.slice(1,))
+					window.feed_carrot(food)
+
+					canvas = document.querySelector('#main');
+					ctx = canvas.getContext('2d', {alpha: false})
+					
+					rectX = 30
+					rectY = 30
+					rectWidth = 250
+					rectHeight = 170
+					
+					ctx.fillStyle = "#000"
+					ctx.font = "24px sans"
+					ctx.textAlign = "center"
+					ctx.textBaseline = "middle"
+					ctx.fillText(window.carrot_generate(), rectX+(rectWidth/2),rectY+(rectHeight/2))
+
+
+				});
+				console.log("sql-js inited");
+			})
+
+			window.onload = function () {
+				console.log("ONLOAD");
+				canvas = document.querySelector('#main');
+				ctx = canvas.getContext('2d', {alpha: false})
+		
+				const width = 600
+				const height = 400
+		
+				ctx.fillStyle = '#00c3ff'
+				ctx.fillRect(0, 0, width, height*0.7)
+				ctx.fillStyle = '#9d582e'
+				ctx.fillRect(0, height*0.7, width, height)
+				
+				ctx.drawImage(carrot_svg, 200, 50)
+				ctx.drawImage(happy_mouth, 340, 145, 345/2.8, 345/2.8)
+
+				rectX = 30
+				rectY = 30
+				rectWidth = 250
+				rectHeight = 170
+				ctx.fillStyle = '#ececbc'
+				ctx.beginPath()
+				ctx.roundRect(rectX, rectY, rectWidth, rectHeight, 40)
+				ctx.closePath()
+				ctx.fill()
+
+				ctx.beginPath()
+				ctx.moveTo(270, 180)
+				ctx.lineTo(330, 190)
+				ctx.lineTo(270, 150)
+				ctx.closePath()
+				ctx.fill()
+			}
         </script>
     </head>
     <body>
@@ -22,6 +79,8 @@
 		<a href="besting">besting</a>
 		<a href="🤝 HANDS SHAKEN">🤝 HANDS SHAKEN</a>
         <p id="message"></p>
-        <canvas id="main"></canvas>
+        <canvas id="main" width="600" height="400" style="background:black"></canvas>
+		<img id="carrot_svg" src="images/carrot.svg" style="display:none">
+		<img id="happy_mouth" src="images/happy_mouth.png" style="display:none">
 	</body>
 </html>
