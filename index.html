@@ -2,20 +2,21 @@
 <html style="background-color: #1c5c2c">
     <head>
         <meta charset="utf-8"/>
-        <script src='sql-wasm.js'></script>
-		<script src="wasm_exec.js"></script>
+        <script src='/sql-wasm.js'></script>
+		<script src="/wasm_exec.js"></script>
 		<!-- <script src="tinygo_wasm_exec.js"></script> -->
         <script>
 	    	const go = new Go();
-			wasm_promise = WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject)
+			wasm_promise = WebAssembly.instantiateStreaming(fetch("/main.wasm"), go.importObject)
 			
 
-			window.db_promise = initSqlJs().then(function(SQL){
+			window.db_promise = initSqlJs({ locateFile: file => `/${file}` }).then(function(SQL){
 				window.db = new SQL.Database();
 				console.log("db set");
 				wasm_promise.then((result) => {
 					console.log("wasm promise: go run started");
 	    	    	go.run(result.instance);
+					console.log(window.location)
 					food = decodeURI(window.location.pathname.slice(1,))
 					window.feed_carrot(food)
 
@@ -80,7 +81,7 @@
 		<a href="🤝 HANDS SHAKEN">🤝 HANDS SHAKEN</a>
         <p id="message"></p>
         <canvas id="main" width="600" height="400" style="background:black"></canvas>
-		<img id="carrot_svg" src="images/carrot.svg" style="display:none">
-		<img id="happy_mouth" src="images/happy_mouth.png" style="display:none">
+		<img id="carrot_svg" src="/images/carrot.svg" style="display:none">
+		<img id="happy_mouth" src="/images/happy_mouth.png" style="display:none">
 	</body>
 </html>
