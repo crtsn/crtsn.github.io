@@ -2,11 +2,13 @@ package main
 
 import (
 	"github.com/crtsn/crtsn/internal"
-	_ "embed"
+	"database/sql"
 	_ "fmt"
 	"log"
 	"regexp"
 	"syscall/js"
+
+	_ "github.com/crtsn/crtsn/sql/sqljs"
 )
 
 var DiscordPingRegexp = regexp.MustCompile("<@[0-9]+>")
@@ -41,7 +43,6 @@ func parseCommand(source string) (Command, bool) {
 }
 
 func feed_carrot(this js.Value, args []js.Value) any {
-	db := this.Get("db")
 	food := args[0].String()
 	internal.FeedMessageToCarrotson(db, food)
 
@@ -55,12 +56,11 @@ func feed_carrot(this js.Value, args []js.Value) any {
 }
 
 func carrot_generate(this js.Value, args []js.Value) any {
-	log.Println("CARROT GENERATE?")
 	arg := ""
 	if len(args) >= 1 {
 		arg = args[0].String()
 	}
-	message, err := internal.CarrotsonGenerate(this.Get("db"), arg, 256)
+	message, err := internal.CarrotsonGenerate(db, arg, 256)
 	if err != nil {
 		log.Printf("%s\n", err)
 		return nil
@@ -68,7 +68,16 @@ func carrot_generate(this js.Value, args []js.Value) any {
 	return message 
 }
 
+var db *sql.DB
 func main() {
+	var err error
+	db, err = sql.Open("sqljs", "db")
+	if err != nil {
+		log.Println("Could not open sqljs:", err)
+		return
+	}
+	defer db.Close()
+
 	window := js.Global().Get("window")
 
 	window.Set("carrot_generate", js.FuncOf(carrot_generate))

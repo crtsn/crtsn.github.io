@@ -1,13 +1,10 @@
 package internal
 
 import (
-	_ "database/sql"
-	"fmt"
+	"database/sql"
 	"errors"
+	"log"
 	"math"
-	"syscall/js"
-
-	_ "github.com/crtsn/crtsn/sql/sqljs"
 )
 
 const ContextSize = 8
@@ -41,18 +38,18 @@ var (
 	EmptyFollowsError = errors.New("Empty follows of a Carrotson branch")
 )
 
-func QueryRandomBranchFromUnfinishedContext(db js.Value, context []rune) (*Branch, error) {
-	fmt.Println("QueryRandomBranchFromUnfinishedContext")
-	rows := db.Call("exec", "SELECT context, follows, frequency FROM Carrotson_Branches WHERE starts_with(context, $1) AND frequency > 0 ORDER BY random() LIMIT 1", []any{string(context)})
-	row := rows.Index(0)
-	if row.IsNull() || row.IsUndefined() {
+func QueryRandomBranchFromUnfinishedContext(db *sql.DB, context []rune) (*Branch, error) {
+	row := db.QueryRow("SELECT context, follows, frequency FROM Carrotson_Branches WHERE starts_with(context, $1) AND frequency > 0 ORDER BY random() LIMIT 1", string(context))
+	var fullContext string
+	var follows string
+	var frequency int64
+	err := row.Scan(&fullContext, &follows, &frequency)
+	if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	values := row.Get("values").Index(0)
-	var fullContext string = values.Index(0).String()
-	var follows string = values.Index(1).String()
-	var frequency int64 = int64(values.Index(2).Int())
-
+	if err != nil {
+		return nil, err
+	}
 	if len(follows) == 0 {
 		return nil, EmptyFollowsError
 	}
@@ -63,17 +60,17 @@ func QueryRandomBranchFromUnfinishedContext(db js.Value, context []rune) (*Branc
 	}, nil
 }
 
-func QueryRandomBranchFromContext(db js.Value, context []rune, t float64) (*Branch, error) {
-	fmt.Println("QueryRandomBranchFromContext")
-	rows := db.Call("exec", "select follows, frequency from (select * from carrotson_branches where context = $1 AND frequency > 0 order by frequency desc limit CEIL((select count(*) from carrotson_branches where context = $1 AND frequency > 0)*1.0*$2)) as c order by random() limit 1", []any{string(context), t})
-	row := rows.Index(0)
-	if row.IsNull() || row.IsUndefined() {
+func QueryRandomBranchFromContext(db *sql.DB, context []rune, t float64) (*Branch, error) {
+	row := db.QueryRow("select follows, frequency from (select * from carrotson_branches where context = $1 AND frequency > 0 order by frequency desc limit CEIL((select count(*) from carrotson_branches where context = $1 AND frequency > 0)*1.0*$2)) as c order by random() limit 1", string(context), t)
+	var follows string
+	var frequency int64
+	err := row.Scan(&follows, &frequency)
+	if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	values := row.Get("values").Index(0)
-	var follows string = values.Index(0).String()
-	var frequency int64 = int64(values.Index(1).Int())
-
+	if err != nil {
+		return nil, err
+	}
 	if len(follows) == 0 {
 		return nil, EmptyFollowsError
 	}
@@ -84,17 +81,19 @@ func QueryRandomBranchFromContext(db js.Value, context []rune, t float64) (*Bran
 	}, nil
 }
 
-func QueryBranchesFromContext(db js.Value, context []rune) ([]Branch, error) {
-	stmt := db.Call("prepare", "SELECT follows, frequency FROM Carrotson_Branches WHERE context = $1 AND frequency > 0")
-	stmt.Call("bind", map[string]any{"$1": string(context)})
-
+func QueryBranchesFromContext(db *sql.DB, context []rune) ([]Branch, error) {
+	rows, err := db.Query("SELECT follows, frequency FROM Carrotson_Branches WHERE context = $1 AND frequency > 0", string(context))
+	if err != nil {
+		return nil, err
+	}
 	branches := []Branch{}
-	for stmt.Call("step").Bool() {
+	for rows.Next() {
 		branch := Branch{}
 		var follows string
-		row := stmt.Call("getAsObject")
-		follows = row.Get("follows").String()
-		branch.Frequency = int64(row.Get("follows").Int())
+		err = rows.Scan(&follows, &branch.Frequency)
+		if err != nil {
+			return nil, err
+		}
 		if len(follows) == 0 {
 			return nil, EmptyFollowsError
 		}
@@ -112,7 +111,7 @@ func ContextOfMessage(message []rune) []rune {
 	return message[i:len(message)]
 }
 
-func CarrotsonGenerate(db js.Value, prefix string, limit int) (string, error) {
+func CarrotsonGenerate(db *sql.DB, prefix string, limit int) (string, error) {
 	var err error = nil
 	var branch *Branch
 	message := []rune(prefix)
@@ -133,11 +132,25 @@ func CarrotsonGenerate(db js.Value, prefix string, limit int) (string, error) {
 	return string(message), err
 }
 
-func FeedMessageToCarrotson(db js.Value, message string) {
-	db.Call("run", "BEGIN;")
-
-	for _, path := range splitMessageIntoPaths([]rune(message)) {
-		db.Call("run", "INSERT INTO Carrotson_Branches (context, follows, frequency) VALUES ($1, $2, 1) ON CONFLICT (context, follows) DO UPDATE SET frequency = Carrotson_Branches.frequency + 1;", []any{string(path.context), string([]rune{path.follows})})
+func FeedMessageToCarrotson(db *sql.DB, message string) {
+	tx, err := db.Begin()
+	if err != nil {
+		log.Println("ERROR: feedMessageToCarrotson: could not start transaction:", err)
+		return
 	}
-	db.Call("run", "COMMIT;")
+	for _, path := range splitMessageIntoPaths([]rune(message)) {
+		_, err := tx.Exec("INSERT INTO Carrotson_Branches (context, follows, frequency) VALUES ($1, $2, 1) ON CONFLICT (context, follows) DO UPDATE SET frequency = Carrotson_Branches.frequency + 1;", string(path.context), string([]rune{path.follows}))
+		if err != nil {
+			log.Println("ERROR: feedMessageToCarrotson: could not insert element", string(path.context), string([]rune{path.follows}), ":", err)
+			err := tx.Rollback()
+			if err != nil {
+				log.Println("ERROR: feedMessageToCarrotson: could not rollback transaction after failure:", err)
+			}
+			return
+		}
+	}
+	err = tx.Commit()
+	if err != nil {
+		log.Println("ERROR: feedMessageToCarrotson: could not commit transaction:", err)
+	}
 }
