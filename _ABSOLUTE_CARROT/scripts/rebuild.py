@@ -9,7 +9,7 @@ import datetime
 directory = Path("_ABSOLUTE_CARROT").resolve()
 go_mtimes = {}
 index_mtime = None
-command = "GOOS=js GOARCH=wasm go build -o ../main.wasm"
+command = "GOOS=js GOARCH=wasm go build -o ../main.wasm cmd/wasm/main.go"
 # command = "GOOS=js GOARCH=wasm tinygo build -o ../main.wasm -target wasm ."
 
 while True:

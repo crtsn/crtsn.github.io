@@ -10,33 +10,41 @@
 			wasm_promise = WebAssembly.instantiateStreaming(fetch("/main.wasm"), go.importObject)
 			
 
+			const dataPromise = fetch("/test.sqlite").then(res => res.arrayBuffer());
 			window.db_promise = initSqlJs({ locateFile: file => `/${file}` }).then(function(SQL){
-				window.db = new SQL.Database();
-				console.log("db set");
-				wasm_promise.then((result) => {
-					console.log("wasm promise: go run started");
-	    	    	go.run(result.instance);
-					console.log(window.location)
-					food = decodeURI(window.location.pathname.slice(1,))
-					window.feed_carrot(food)
+				dataPromise.then(buf => {
+					window.db = new SQL.Database(new Uint8Array(buf));
+					console.log("db set");
+					db.create_function("starts_with", (a, b) => a.startsWith(b));
+					// db.create_function("random", () => { 
+					// 	return Math.floor(Math.random() * (9223372036854775807 - -9223372036854775807 + 1) + -9223372036854775807)
+					// });
+					wasm_promise.then((result) => {
+						console.log("wasm promise: go run started");
+	    	    		go.run(result.instance);
+						console.log(window.location)
+						food = decodeURI(window.location.pathname.slice(1,))
+						window.feed_carrot(food)
 
-					canvas = document.querySelector('#main');
-					ctx = canvas.getContext('2d', {alpha: false})
-					
-					rectX = 30
-					rectY = 30
-					rectWidth = 250
-					rectHeight = 170
-					
-					ctx.fillStyle = "#000"
-					ctx.font = "24px sans"
-					ctx.textAlign = "center"
-					ctx.textBaseline = "middle"
-					ctx.fillText(window.carrot_generate(), rectX+(rectWidth/2),rectY+(rectHeight/2))
+						canvas = document.querySelector('#main');
+						ctx = canvas.getContext('2d', {alpha: false})
+						
+						rectX = 30
+						rectY = 30
+						rectWidth = 250
+						rectHeight = 170
+						
+						ctx.fillStyle = "#000"
+						ctx.font = "24px sans"
+						ctx.textAlign = "center"
+						ctx.textBaseline = "middle"
+						ctx.fillText(window.carrot_generate(), rectX+(rectWidth/2),rectY+(rectHeight/2))
+						
+						console.log(window.carrot_generate("b"))
 
-
+					});
+					console.log("sql-js inited");
 				});
-				console.log("sql-js inited");
 			})
 
 			window.onload = function () {

@@ -1,9 +1,13 @@
-package main
+package internal
 
 import (
+	_ "database/sql"
+	"fmt"
 	"errors"
 	"math"
 	"syscall/js"
+
+	_ "github.com/crtsn/crtsn/sql/sqljs"
 )
 
 const ContextSize = 8
@@ -38,7 +42,8 @@ var (
 )
 
 func QueryRandomBranchFromUnfinishedContext(db js.Value, context []rune) (*Branch, error) {
-	rows := db.Call("exec", "SELECT context, follows, frequency FROM Carrotson_Branches WHERE context LIKE ? AND frequency > 0 ORDER BY random() LIMIT 1", []any{string(context) + "%"})
+	fmt.Println("QueryRandomBranchFromUnfinishedContext")
+	rows := db.Call("exec", "SELECT context, follows, frequency FROM Carrotson_Branches WHERE starts_with(context, $1) AND frequency > 0 ORDER BY random() LIMIT 1", []any{string(context)})
 	row := rows.Index(0)
 	if row.IsNull() || row.IsUndefined() {
 		return nil, nil
@@ -59,7 +64,8 @@ func QueryRandomBranchFromUnfinishedContext(db js.Value, context []rune) (*Branc
 }
 
 func QueryRandomBranchFromContext(db js.Value, context []rune, t float64) (*Branch, error) {
-	rows := db.Call("exec", "select follows, frequency from (select * from carrotson_branches where context = ? AND frequency > 0 order by frequency desc limit CEIL((select count(*) from carrotson_branches where context = ? AND frequency > 0)*1.0*?)) as c order by random() limit 1", []any{string(context), string(context), t})
+	fmt.Println("QueryRandomBranchFromContext")
+	rows := db.Call("exec", "select follows, frequency from (select * from carrotson_branches where context = $1 AND frequency > 0 order by frequency desc limit CEIL((select count(*) from carrotson_branches where context = $1 AND frequency > 0)*1.0*$2)) as c order by random() limit 1", []any{string(context), t})
 	row := rows.Index(0)
 	if row.IsNull() || row.IsUndefined() {
 		return nil, nil
@@ -131,7 +137,7 @@ func FeedMessageToCarrotson(db js.Value, message string) {
 	db.Call("run", "BEGIN;")
 
 	for _, path := range splitMessageIntoPaths([]rune(message)) {
-		db.Call("run", "INSERT INTO Carrotson_Branches (context, follows, frequency) VALUES (?, ?, 1) ON CONFLICT (context, follows) DO UPDATE SET frequency = Carrotson_Branches.frequency + 1;", []any{string(path.context), string([]rune{path.follows})})
+		db.Call("run", "INSERT INTO Carrotson_Branches (context, follows, frequency) VALUES ($1, $2, 1) ON CONFLICT (context, follows) DO UPDATE SET frequency = Carrotson_Branches.frequency + 1;", []any{string(path.context), string([]rune{path.follows})})
 	}
 	db.Call("run", "COMMIT;")
 }

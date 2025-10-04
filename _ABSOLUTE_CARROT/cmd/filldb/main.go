@@ -68,7 +68,7 @@ func carrot_generate(this js.Value, args []js.Value) any {
 func main() {
 	window := js.Global().Get("window")
 	db := js.Global().Get("db")
-	db.Call("run", init_sql)
+	// db.Call("run", init_sql)
 
 	window.Set("carrot_generate", js.FuncOf(carrot_generate))
 	window.Set("feed_carrot", js.FuncOf(feed_carrot))
