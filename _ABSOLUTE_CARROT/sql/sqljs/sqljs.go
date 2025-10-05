@@ -56,7 +56,7 @@ func (c *conn) Close() error {
 
 func (c *conn) Prepare(query string) (ds driver.Stmt, err error) {
 	s := c.db.Call("prepare", query)
-	return &stmt{c, s}, nil
+	return &stmt{c: c, s: s}, nil
 }
 
 func (t *tx) Commit() (err error) {
@@ -96,9 +96,9 @@ func (s *stmt) Query(args []driver.Value) (driver.Rows, error) {
 	hasRows := s.s.Call("step").Bool()
 	if s.columns == nil {
 		columns_value := s.s.Call("getColumnNames")
-		columns := make([]string, columns_value.Length())
-		for i, _ := range columns {
-			columns[i] = columns_value.Get(strconv.Itoa(i)).String()
+		s.columns = make([]string, columns_value.Length())
+		for i, _ := range s.columns {
+			s.columns[i] = columns_value.Get(strconv.Itoa(i)).String()
 		}
 	}
 	r := &rows{s, hasRows}

@@ -10,7 +10,9 @@
 			wasm_promise = WebAssembly.instantiateStreaming(fetch("/main.wasm"), go.importObject)
 			
 
-			const dataPromise = fetch("/test.sqlite").then(res => res.arrayBuffer());
+			// const db_path = "/test.sqlite"
+			const db_path = "/bee.sqlite"
+			const dataPromise = fetch(db_path).then(res => res.arrayBuffer());
 			window.db_promise = initSqlJs({ locateFile: file => `/${file}` }).then(function(SQL){
 				dataPromise.then(buf => {
 					window.db = new SQL.Database(new Uint8Array(buf));
@@ -37,16 +39,46 @@
 						ctx.fillStyle = "#000"
 						ctx.font = "24px sans"
 						ctx.textAlign = "center"
-						ctx.textBaseline = "middle"
-						ctx.fillText(window.carrot_generate(), rectX+(rectWidth/2),rectY+(rectHeight/2))
-						
-						console.log(window.carrot_generate("b"))
-
+						// ctx.textBaseline = "middle"
+						var lines = fragmentText(window.carrot_generate(), rectWidth - parseInt(ctx.font,0));
+					    lines.forEach(function(line, i) {
+					        ctx.fillText(line, rectX + rectWidth / 2, rectY + (rectHeight - parseInt(ctx.font,0) * lines.length) / 2 + (i + 1) * parseInt(ctx.font,0));
+					    });
 					});
 					console.log("sql-js inited");
 				});
 			})
 
+
+			function fragmentText(text, maxWidth) {
+			    var words = text.split(' '),
+			        lines = [],
+			        line = "";
+			    if (ctx.measureText(text).width < maxWidth) {
+			        return [text];
+			    }
+			    while (words.length > 0) {
+			        while (ctx.measureText(words[0]).width >= maxWidth) {
+			            var tmp = words[0];
+			            words[0] = tmp.slice(0, -1);
+			            if (words.length > 1) {
+			                words[1] = tmp.slice(-1) + words[1];
+			            } else {
+			                words.push(tmp.slice(-1));
+			            }
+			        }
+			        if (ctx.measureText(line + words[0]).width < maxWidth) {
+			            line += words.shift() + " ";
+			        } else {
+			            lines.push(line);
+			            line = "";
+			        }
+			        if (words.length === 0) {
+			            lines.push(line);
+			        }
+			    }
+			    return lines;
+			}
 			window.onload = function () {
 				console.log("ONLOAD");
 				canvas = document.querySelector('#main');

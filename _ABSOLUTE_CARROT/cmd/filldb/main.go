@@ -3,11 +3,12 @@ package main
 import (
 	"database/sql"
 	"errors"
-	_ "fmt"
+	"fmt"
 	"github.com/crtsn/crtsn/carrotson"
 	"log"
 	"os"
 	"regexp"
+	"strings"
 
 	_ "github.com/crtsn/crtsn/sql/libsqlite3"
 )
@@ -45,7 +46,8 @@ func parseCommand(source string) (Command, bool) {
 
 func main() {
 	// assuming running by `go run cmd/filldb/main.go` in _ABSOLUTE_CARROT directory
-	db_path := "../test.sqlite"
+	// db_path := "../test.sqlite"
+	db_path := "../bee.sqlite"
 	shouldRemove := true
 	shouldInit := false
 	if _, err := os.Stat(db_path); err == nil {
@@ -76,10 +78,21 @@ func main() {
 		}
 	}
 
-	carrotson.FeedMessageToCarrotson(db, "HELLO")
-	carrotson.FeedMessageToCarrotson(db, "HELP")
-	carrotson.FeedMessageToCarrotson(db, "HELL")
-	carrotson.FeedMessageToCarrotson(db, "HELLO KITTY")
-	carrotson.FeedMessageToCarrotson(db, "HELLO WORLD")
-	carrotson.FeedMessageToCarrotson(db, "MOM'S SPAGETI")
+	// carrotson.FeedMessageToCarrotson(db, "HELLO")
+	// carrotson.FeedMessageToCarrotson(db, "HELP")
+	// carrotson.FeedMessageToCarrotson(db, "HELL")
+	// carrotson.FeedMessageToCarrotson(db, "HELLO KITTY")
+	// carrotson.FeedMessageToCarrotson(db, "HELLO WORLD")
+	// carrotson.FeedMessageToCarrotson(db, "MOM'S SPAGETI")
+	
+	b, err := os.ReadFile("../../bee.txt")
+	temp := strings.Split(string(b),"\n")
+    if err != nil {
+        fmt.Println(err)
+		return
+    }
+
+	for _, line := range temp {
+		carrotson.FeedMessageToCarrotson(db, line)
+	}
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	_ "fmt"
-	"github.com/crtsn/crtsn/internal"
+	"github.com/crtsn/crtsn/carrotson"
 	"log"
 	"regexp"
 	"syscall/js"
@@ -44,7 +44,7 @@ func parseCommand(source string) (Command, bool) {
 
 func feed_carrot(this js.Value, args []js.Value) any {
 	food := args[0].String()
-	internal.FeedMessageToCarrotson(db, food)
+	carrotson.FeedMessageToCarrotson(db, food)
 
 	// JSON := js.Global().Get("JSON")
 	// stmt := db.Call("prepare", "SELECT * FROM Carrotson_Branches")
@@ -60,7 +60,7 @@ func carrot_generate(this js.Value, args []js.Value) any {
 	if len(args) >= 1 {
 		arg = args[0].String()
 	}
-	message, err := internal.CarrotsonGenerate(db, arg, 256)
+	message, err := carrotson.CarrotsonGenerate(db, arg, 70)
 	if err != nil {
 		log.Printf("%s\n", err)
 		return nil
