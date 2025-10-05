@@ -3,17 +3,17 @@ package sqljs
 import (
 	"database/sql"
 	"database/sql/driver"
-	"syscall/js"
 	_ "fmt"
 	"io"
 	"strconv"
+	"syscall/js"
 )
 
 const (
 	driverName = "sqljs"
 )
 
-type Driver struct { }
+type Driver struct{}
 
 type conn struct {
 	db js.Value
@@ -24,23 +24,18 @@ type tx struct {
 }
 
 type stmt struct {
-	c    *conn
-	s	 js.Value
+	c       *conn
+	columns []string
+	s       js.Value
 }
 
 type rows struct {
-	s		*stmt
-	columns []string
-	hasRows	bool
+	s       *stmt
+	hasRows bool
 }
 
-
-var d = &Driver{}
-func newDriver() *Driver { return d }
-
-
 func init() {
-	sql.Register(driverName, newDriver())
+	sql.Register(driverName, &Driver{})
 }
 
 func (d *Driver) Open(name string) (c driver.Conn, err error) {
@@ -92,19 +87,21 @@ func (s *stmt) NumInput() (n int) {
 	return -1
 }
 
-func (s *stmt) Query(args []driver.Value) (driver.Rows, error) { 
+func (s *stmt) Query(args []driver.Value) (driver.Rows, error) {
 	new_args := make([]any, len(args))
 	for i, arg := range args {
 		new_args[i] = js.ValueOf(arg)
 	}
 	s.s.Call("bind", new_args)
 	hasRows := s.s.Call("step").Bool()
-	columns_value := s.s.Call("getColumnNames")
-	columns := make([]string, columns_value.Length())
-	for i, _ := range columns {
-		columns[i] = columns_value.Get(strconv.Itoa(i)).String()
+	if s.columns == nil {
+		columns_value := s.s.Call("getColumnNames")
+		columns := make([]string, columns_value.Length())
+		for i, _ := range columns {
+			columns[i] = columns_value.Get(strconv.Itoa(i)).String()
+		}
 	}
-	r := &rows{s, columns, hasRows}
+	r := &rows{s, hasRows}
 	return r, nil
 }
 
@@ -113,14 +110,14 @@ func (r *rows) Close() (err error) {
 }
 
 func (r *rows) Columns() (c []string) {
-	return r.columns
+	return r.s.columns
 }
 
 func (r *rows) Next(dest []driver.Value) (err error) {
 	if !r.hasRows {
 		return io.EOF
 	}
-	
+
 	row := r.s.s.Call("get")
 	for i := 0; i < row.Length(); i++ {
 		value := row.Get(strconv.Itoa(i))

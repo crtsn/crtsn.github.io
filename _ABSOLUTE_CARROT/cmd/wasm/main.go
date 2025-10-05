@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/crtsn/crtsn/internal"
 	"database/sql"
 	_ "fmt"
+	"github.com/crtsn/crtsn/internal"
 	"log"
 	"regexp"
 	"syscall/js"
@@ -65,10 +65,11 @@ func carrot_generate(this js.Value, args []js.Value) any {
 		log.Printf("%s\n", err)
 		return nil
 	}
-	return message 
+	return message
 }
 
 var db *sql.DB
+
 func main() {
 	var err error
 	db, err = sql.Open("sqljs", "db")

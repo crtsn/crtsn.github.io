@@ -1,4 +1,4 @@
-package internal
+package carrotson
 
 import (
 	"database/sql"

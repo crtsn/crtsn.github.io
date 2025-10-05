@@ -1,11 +1,15 @@
 package main
 
 import (
-	_ "embed"
+	"database/sql"
+	"errors"
 	_ "fmt"
+	"github.com/crtsn/crtsn/carrotson"
 	"log"
+	"os"
 	"regexp"
-	"syscall/js"
+
+	_ "github.com/crtsn/crtsn/sql/libsqlite3"
 )
 
 var DiscordPingRegexp = regexp.MustCompile("<@[0-9]+>")
@@ -39,46 +43,43 @@ func parseCommand(source string) (Command, bool) {
 	}, true
 }
 
-//go:embed 02-carrotson.sql
-var init_sql string
-
-func feed_carrot(this js.Value, args []js.Value) any {
-	db := this.Get("db")
-	food := args[0].String()
-	FeedMessageToCarrotson(db, food)
-
-	// JSON := js.Global().Get("JSON")
-	// stmt := db.Call("prepare", "SELECT * FROM Carrotson_Branches")
-	// for stmt.Call("step").Bool() {
-	// 	row := stmt.Call("getAsObject");
-	// 	fmt.Println("Here is a row: " + JSON.Call("stringify", row).String())
-	// }
-	return nil
-}
-
-func carrot_generate(this js.Value, args []js.Value) any {
-	message, err := CarrotsonGenerate(this.Get("db"), "", 256)
-	if err != nil {
-		log.Printf("%s\n", err)
-		return nil
-	}
-	return message 
-}
-
 func main() {
-	window := js.Global().Get("window")
-	db := js.Global().Get("db")
-	// db.Call("run", init_sql)
+	// assuming running by `go run cmd/filldb/main.go` in _ABSOLUTE_CARROT directory
+	db_path := "../test.sqlite"
+	shouldRemove := true
+	shouldInit := false
+	if _, err := os.Stat(db_path); err == nil {
+		if shouldRemove {
+			if err = os.Remove(db_path); err != nil {
+				log.Fatal(err)
+			}
+			shouldInit = true
+		}
+	} else if errors.Is(err, os.ErrNotExist) {
+		shouldInit = true
+	} else {
+		log.Println("Errors while checking file existence:", err)
+		return
+	}
+	db, err := sql.Open("libsqlite3", db_path)
+	if err != nil {
+		log.Println("Could not open sqljs:", err)
+		return
+	}
+	defer db.Close()
 
-	window.Set("carrot_generate", js.FuncOf(carrot_generate))
-	window.Set("feed_carrot", js.FuncOf(feed_carrot))
-	
-	FeedMessageToCarrotson(db, "HELLO")
-	FeedMessageToCarrotson(db, "HELP")
-	FeedMessageToCarrotson(db, "HELL")
-	FeedMessageToCarrotson(db, "HELLO KITTY")
-	FeedMessageToCarrotson(db, "HELLO WORLD")
-	FeedMessageToCarrotson(db, "MOM'S SPAGETI")
+	if shouldInit {
+		_, err = db.Exec(carrotson.InitSql)
+		if err != nil {
+			log.Println("ERROR: couldn't init db:", err)
+			return
+		}
+	}
 
-	select {}
+	carrotson.FeedMessageToCarrotson(db, "HELLO")
+	carrotson.FeedMessageToCarrotson(db, "HELP")
+	carrotson.FeedMessageToCarrotson(db, "HELL")
+	carrotson.FeedMessageToCarrotson(db, "HELLO KITTY")
+	carrotson.FeedMessageToCarrotson(db, "HELLO WORLD")
+	carrotson.FeedMessageToCarrotson(db, "MOM'S SPAGETI")
 }
