@@ -118,12 +118,13 @@
 				    cday.setFullYear(cday.getFullYear() + 1);
 				}  
 				var one_day = 1000 * 60 * 60 * 24;
-				console.log(Math.ceil((cday.getTime() - today.getTime()) / (one_day)) + " days left until CARROT DAY!");
+				subtitle.innerHTML += Math.ceil((cday.getTime() - today.getTime()) / (one_day)) + " days left"
 			}
         </script>
     </head>
     <body>
-		<h1>!carrot HAPPY CARROT DAY</h1>
+		<h1 id="title">!carrot HAPPY CARROT DAY</h1>
+		<h3 id="subtitle"></h3>
 		<a href="testing">testing</a>
 		<a href="besting">besting</a>
 		<a href="🤝 HANDS SHAKEN">🤝 HANDS SHAKEN</a>
