@@ -79,6 +79,14 @@
 				ctx.lineTo(270, 150)
 				ctx.closePath()
 				ctx.fill()
+
+				today = new Date();
+				var cday = new Date(today.getFullYear(), 10, 9);
+				if (today.getMonth() == 10 && today.getDate() > 9) {
+				    cday.setFullYear(cday.getFullYear() + 1);
+				}  
+				var one_day = 1000 * 60 * 60 * 24;
+				console.log(Math.ceil((cday.getTime() - today.getTime()) / (one_day)) + " days left until CARROT DAY!");
 			}
         </script>
     </head>
