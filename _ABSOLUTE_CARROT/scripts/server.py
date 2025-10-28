@@ -9,7 +9,7 @@ class MyHandler(SimpleHTTPRequestHandler):
     def send_error(self, code, message=None):
         if code == 404:
             with open("404.html") as html_file:
-                self.error_message_format = html_file.read()
+                self.error_message_format = html_file.read().replace('%', '%%')
         SimpleHTTPRequestHandler.send_error(self, code, message)
 
 if __name__ == "__main__":

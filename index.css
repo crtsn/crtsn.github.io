@@ -1,0 +1,46 @@
+#title {
+	margin: 0;
+}
+
+html {
+	background-color: #00c3ff
+}
+
+html, body {
+	margin: 0;
+	height: 100vh;
+	width: 100%;
+}
+
+#garden {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+    margin: 0;
+    padding: 0;
+    background: url(/images/garden.svg) no-repeat center bottom;
+    width: 100%;
+	z-index: 0;
+}
+
+@media (min-aspect-ratio: 4/3) {
+	#garden { 
+		height: 75vh;
+		background-size: 100% 100%;
+	}
+}
+
+@media (max-aspect-ratio: 4/3) {
+	#garden { 
+		height: 75vh; 
+		background-size: cover; 
+		background-position: center bottom; 
+	}
+}
+
+body > *:not(#garden) {
+	position: relative;
+	z-index: 1;
+}
+
