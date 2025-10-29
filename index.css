@@ -1,15 +1,15 @@
-#title {
-	margin: 0;
-}
-
 html {
 	background-color: #00c3ff
 }
 
 html, body {
 	margin: 0;
-	height: 100vh;
 	width: 100%;
+}
+
+#title, #subtitle, body > a, body > p {
+	position: relative;
+	z-index: 1000;
 }
 
 #garden {
@@ -24,14 +24,14 @@ html, body {
 	z-index: 0;
 }
 
-@media (min-aspect-ratio: 4/3) {
+@media (min-aspect-ratio: 3/2) {
 	#garden { 
 		height: 75vh;
 		background-size: 100% 100%;
 	}
 }
 
-@media (max-aspect-ratio: 4/3) {
+@media (max-aspect-ratio: 3/2) {
 	#garden { 
 		height: 75vh; 
 		background-size: cover; 
@@ -39,8 +39,99 @@ html, body {
 	}
 }
 
-body > *:not(#garden) {
-	position: relative;
-	z-index: 1;
+#carrot {
+	position: fixed;
+	bottom: 10vh;
+	height: 40vh;
 }
+
+@media (min-aspect-ratio: 1/1) {
+	#carrot { 
+		right: 35vw;
+		width: 80vw;
+	}
+}
+
+@media (max-aspect-ratio: 1/1) {
+	#carrot { 
+		right: 10vw;
+		width: 80vw;
+	}
+}
+
+@media (max-width: 450px) {
+	#carrot { 
+		right: 0;
+		width: 100vw;
+	}
+}
+
+#face {
+	position: absolute;
+	z-index: 1;
+	right: 0;
+}
+
+@media (max-width: 450px) {
+	#face { 
+		transform: translate(-76%, 0);
+	}
+}
+
+#mouth {
+	position: absolute;
+	z-index: 2;
+	right: 0;
+	transform: translate(2%, -45%) scale(0.4);
+	transform-origin: bottom right;
+}
+
+@media (max-width: 450px) {
+	#mouth { 
+		transform: translate(-21%, -45%) scale(0.4);
+	}
+}
+
+#triangle {
+	position: absolute;
+	z-index: 3;
+	width: 100px;
+	fill: #ececbc;
+	right: 0;
+	transform: translate(-118%,33%);
+	transform-origin: bottom right;
+}
+
+@media (max-width: 450px) {
+	#triangle { 
+		transform: translate(-143%,-109%) scale(0.6, 0.5) skew(-35deg,0deg);
+	}
+}
+
+#message {
+	position: absolute;
+	z-index: 4;
+	right: 0;
+	width: 200px;
+	padding: 30px;
+	transform: translate(-46%,-39%);
+	transform-origin: bottom right;
+	border-radius: 20px;
+	background-color: #ececbc;
+	font-family: sans;
+	font-size: larger;
+	text-align: center;
+}
+
+@media (max-width: 450px) {
+	#message { 
+		transform: unset;
+		bottom: 49vh;
+		width: calc(100% - 30px);
+		padding: 20px 5px;
+		margin: ;
+		right: 10px;
+	}
+}
+
 
