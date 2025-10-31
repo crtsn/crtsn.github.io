@@ -5,6 +5,7 @@ html {
 html, body {
 	margin: 0;
 	width: 100%;
+	font-size: 16pt;
 }
 
 #title, #subtitle, body > a, body > p {
@@ -59,7 +60,7 @@ html, body {
 	}
 }
 
-@media (max-width: 450px) {
+@media (max-aspect-ratio: 3/4) {
 	#carrot { 
 		right: 0;
 		width: 100vw;
@@ -70,11 +71,14 @@ html, body {
 	position: absolute;
 	z-index: 1;
 	right: 0;
+	user-select: none;
 }
 
-@media (max-width: 450px) {
+@media (max-aspect-ratio: 3/4) {
 	#face { 
-		transform: translate(-76%, 0);
+		width: clamp(6rem,30vw,14rem);
+		right: 50%;
+		transform: translateX(50%);
 	}
 }
 
@@ -84,11 +88,14 @@ html, body {
 	right: 0;
 	transform: translate(2%, -45%) scale(0.4);
 	transform-origin: bottom right;
+	user-select: none;
 }
 
-@media (max-width: 450px) {
+@media (max-aspect-ratio: 3/4) {
 	#mouth { 
-		transform: translate(-21%, -45%) scale(0.4);
+		width: clamp(6rem,30vw,14rem);
+		right: 51%;
+		transform: translate(50%, 59%);
 	}
 }
 
@@ -102,9 +109,31 @@ html, body {
 	transform-origin: bottom right;
 }
 
-@media (max-width: 450px) {
+@property --x {
+  syntax: "<length>";
+  initial-value: 0px;
+  inherits: false;
+}
+
+@property --y {
+  syntax: "<length>";
+  initial-value: 0px;
+  inherits: false;
+}
+
+@media (max-aspect-ratio: 3/4) {
 	#triangle { 
-		transform: translate(-143%,-109%) scale(0.6, 0.5) skew(-35deg,0deg);
+		--height: calc(8.5vh);
+		--width: calc(20vw);
+		--x: var(--height);
+		--y: var(--width);
+		--ratio: calc( tan( atan2(var(--y), var(--x)) ) );
+		--angle: calc( atan(var(--ratio)) );
+		right: 50%;
+		bottom: 41vh;
+		width: var(--width);
+		height: var(--height);
+		transform: skewX(calc( -0.8 * var(--angle) ) );
 	}
 }
 
@@ -112,25 +141,27 @@ html, body {
 	position: absolute;
 	z-index: 4;
 	right: 0;
+	bottom: 32vh;
 	width: 200px;
 	padding: 30px;
-	transform: translate(-46%,-39%);
+	transform: translate(-41%,0);
 	transform-origin: bottom right;
 	border-radius: 20px;
 	background-color: #ececbc;
 	font-family: sans;
-	font-size: larger;
+	font-size: x-large;
 	text-align: center;
 }
 
-@media (max-width: 450px) {
+@media (max-aspect-ratio: 3/4) {
 	#message { 
 		transform: unset;
 		bottom: 49vh;
 		width: calc(100% - 30px);
-		padding: 20px 5px;
-		margin: ;
-		right: 10px;
+		padding: 0.4rem 0.5rem;
+		right: 0.2rem;
+		font-size: clamp(1rem, 6vw, 3rem);
+		overflow-wrap: anywhere;
 	}
 }
 
