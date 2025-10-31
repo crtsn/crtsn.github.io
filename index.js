@@ -39,6 +39,11 @@ window.onload = function () {
 	}  
 	var one_day = 1000 * 60 * 60 * 24;
 	subtitle.innerHTML += Math.ceil((cday.getTime() - today.getTime()) / (one_day)) + " days left"
+
+	refresh.onclick = e => {
+		var new_message = window.carrot_generate();
+		message.innerHTML = new_message;
+	}
 }
 document.addEventListener("DOMContentLoaded", function(event) {
 	console.log("DOMContentLoaded");
@@ -56,3 +61,4 @@ window.onkeydown = e => {
 			} break
     }
 }
+

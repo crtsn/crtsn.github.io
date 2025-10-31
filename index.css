@@ -105,17 +105,17 @@ html, body {
 	width: 100px;
 	fill: #ececbc;
 	right: 0;
-	transform: translate(-118%,33%);
+	transform: translate(-118%,0%);
 	transform-origin: bottom right;
 }
 
-@property --x {
+@property --width {
   syntax: "<length>";
   initial-value: 0px;
   inherits: false;
 }
 
-@property --y {
+@property --height {
   syntax: "<length>";
   initial-value: 0px;
   inherits: false;
@@ -123,11 +123,9 @@ html, body {
 
 @media (max-aspect-ratio: 3/4) {
 	#triangle { 
-		--height: calc(8.5vh);
 		--width: calc(20vw);
-		--x: var(--height);
-		--y: var(--width);
-		--ratio: calc( tan( atan2(var(--y), var(--x)) ) );
+		--height: calc(8.5vh);
+		--ratio: calc( tan( atan2(var(--width), var(--height)) ) );
 		--angle: calc( atan(var(--ratio)) );
 		right: 50%;
 		bottom: 41vh;
@@ -137,32 +135,77 @@ html, body {
 	}
 }
 
-#message {
+#message_ui {
 	position: absolute;
 	z-index: 4;
 	right: 0;
-	bottom: 32vh;
-	width: 200px;
-	padding: 30px;
-	transform: translate(-41%,0);
-	transform-origin: bottom right;
-	border-radius: 20px;
+	width: 12rem;
+	bottom: 35vh;
+	display: flex;
+	transform: translate(-44%,0);
+}
+
+@media (max-aspect-ratio: 3/4) {
+	#message_ui { 
+		transform: unset;
+		bottom: 49vh;
+		width: calc(100% - 0.8rem);
+		right: 0.2rem;
+		flex-direction: column-reverse;
+	}
+}
+
+#message {
+	padding: 0.5em;
+	width: 100%;
+	border-radius: 0.9em;
 	background-color: #ececbc;
 	font-family: sans;
 	font-size: x-large;
 	text-align: center;
+	align-content: center;
 }
 
 @media (max-aspect-ratio: 3/4) {
 	#message { 
-		transform: unset;
-		bottom: 49vh;
 		width: calc(100% - 30px);
 		padding: 0.4rem 0.5rem;
-		right: 0.2rem;
 		font-size: clamp(1rem, 6vw, 3rem);
 		overflow-wrap: anywhere;
 	}
 }
 
+#refresh_bottom {
+	align-content: end;
+}
 
+@media (max-aspect-ratio: 3/4) {
+	#refresh_bottom { 
+		position: absolute;
+		bottom: 0;
+		transform: translateY(80%);
+		width: clamp(2rem, 14vw, 8rem);
+		height: clamp(2rem, 14vw, 8rem);
+	}
+}
+
+#refresh {
+	height: 3rem;
+	width: 3rem;
+	fill: #7ab722;
+	stroke: black;
+	stroke-width: 0.015em;
+	font: bold 18rem sans;
+	user-select: none;
+}
+
+#refresh:hover {
+	cursor: pointer;
+}
+
+@media (max-aspect-ratio: 3/4) {
+	#refresh {
+		height: 100%;
+		width: 100%;
+	}
+}
