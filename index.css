@@ -1,11 +1,15 @@
 html {
-	background-color: #00c3ff
+	background-color: #00c3ff;
 }
 
 html, body {
 	margin: 0;
 	width: 100%;
 	font-size: 16pt;
+}
+
+* {
+    touch-action: manipulation;
 }
 
 #title, #subtitle, body > a, body > p {
@@ -139,7 +143,7 @@ html, body {
 	position: absolute;
 	z-index: 4;
 	right: 0;
-	width: 12rem;
+	width: 13rem;
 	bottom: 35vh;
 	display: flex;
 	transform: translate(-44%,0);
@@ -183,20 +187,18 @@ html, body {
 	#refresh_bottom { 
 		position: absolute;
 		bottom: 0;
-		transform: translateY(80%);
-		width: clamp(2rem, 14vw, 8rem);
-		height: clamp(2rem, 14vw, 8rem);
+		transform: translateY(105%);
+		width: clamp(2rem, 11vw, 8rem);
+		height: clamp(2rem, 11vw, 8rem);
 	}
 }
 
 #refresh {
-	height: 3rem;
-	width: 3rem;
-	fill: #7ab722;
-	stroke: black;
-	stroke-width: 0.015em;
-	font: bold 72px sans;
+	height: 2rem;
+	width: 2rem;
 	user-select: none;
+	padding-right: 0.2rem;
+	display: block;
 }
 
 #refresh:hover {
