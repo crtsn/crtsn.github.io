@@ -6,6 +6,14 @@ html, body {
 	margin: 0;
 	width: 100%;
 	font-size: 16pt;
+	position: fixed;
+	height: 100dvh;
+}
+
+@media (min-aspect-ratio: 3/4) {
+	html, body {
+		font-size: 12pt;
+	}
 }
 
 * {
@@ -53,6 +61,12 @@ html, body {
 	bottom: 10vh;
 }
 
+@media (max-aspect-ratio: 3/4) {
+	#everything_center { 
+		bottom: 0;
+	}
+}
+
 #everything {
 	display: grid;
 	grid-template-columns: 1fr max-content;
@@ -60,9 +74,9 @@ html, body {
 
 @media (max-aspect-ratio: 3/4) {
 	#everything { 
-	grid-template-rows: 1fr max-content max-content;
-	grid-template-columns: unset;
-	width: 100%;
+		grid-template-rows: 1fr max-content 3rem;
+		grid-template-columns: unset;
+		width: 100%;
 	}
 }
 
@@ -71,30 +85,31 @@ html, body {
 	user-select: none;
 	display: grid;
 	grid-template-columns: 1fr;
+	width: clamp(7rem,13vw,9rem);
 }
 
 @media (max-aspect-ratio: 3/4) {
 	#carrot { 
+		width: clamp(6rem,21vmax,15rem);
+		justify-self: center;
 	}
 }
 
 #body {
+	width: 100%;
 	grid-column-start: 1;
 	grid-row-start: 1;
-	justify-self: center;
-	width: clamp(5rem,33vw,6rem);
 }
 
 @media (max-aspect-ratio: 3/4) {
 	#body { 
-		width: clamp(6rem,21vmax,15rem);
 	}
 }
 
 #mouth {
+	width: 100%;
 	transform-origin: bottom right;
 	transform: translate(-7%, 58%);
-	width: clamp(5rem,33vw,6rem);
 	user-select: none;
 	grid-column-start: 1;
 	grid-row-start: 1;
@@ -102,27 +117,27 @@ html, body {
 
 @media (max-aspect-ratio: 3/4) {
 	#mouth { 
-		justify-self: center;
-		width: clamp(6rem,21vmax,15rem);
 	}
 }
 
 #triangle_row {
 	justify-self: flex-end;
 	transform: translateY(-1%);
+	grid-row: 2;
+	grid-column: 2;
 }
 
 @media (max-aspect-ratio: 3/4) {
 	#triangle_row { 
-		grid-column-start: 1;
-		grid-row-start: 1;
+		grid-column: 1;
+		grid-row: 2;
 		justify-self: center;
-		transform: translate(-20%,46%);
+		transform: translate(-20%,0%);
 	}
 }
 
 #triangle {
-	width: 100px;
+	width: 5rem;
 	fill: #ececbc;
 }
 
@@ -153,34 +168,26 @@ html, body {
 }
 
 #messaging {
-	width: 14rem;
+	/*! width: 100%; */
 	display: grid;
-	grid-template-rows: 1fr 1fr;
-	transform: translate(0%, -32%);
+	grid-template-columns: max-content 1fr;
+	transform: translate(0%, -41%);
 	padding-right: 0.5rem;
 	justify-self: end;
+	align-content: end;
+	width: clamp(15rem, 35vw, 25rem);
 }
 
 @media (max-aspect-ratio: 3/4) {
 	#messaging { 
 		grid-template-rows: 1fr 0.2fr;
 		transform: unset;
-		width: 100%;
 		padding-right: unset;
-	}
-}
-
-#response_ui {
-	display: flex;
-}
-
-@media (max-aspect-ratio: 3/4) {
-	#response_ui { 
+		grid-template-columns: unset;
 		width: calc(100% - 1rem);
 		margin: 0rem 0.5rem;
-		flex-direction: column-reverse;
-		grid-column-start: 1;
-		grid-row-start: 1;
+		height: 100%;
+		grid-template-rows: max-content 0.2fr;
 	}
 }
 
@@ -192,19 +199,31 @@ html, body {
 	font-family: sans;
 	font-size: x-large;
 	text-align: center;
-	align-content: center;
+	/*! justify-self: flex-end; */
+	grid-row: 1;
+	grid-column: 2;
+	/*! width: clamp(15rem, 49vw, 20rem); */
+	box-sizing: border-box;
 }
 
 @media (max-aspect-ratio: 3/4) {
 	#response { 
+		grid-row: 1;
+		grid-column: 1;
 		padding: 0.4rem 0rem;
-		font-size: clamp(1rem, 6vw, 3rem);
+		font-size: clamp(1rem, 11vw, 5rem);
 		overflow-wrap: anywhere;
+		width: 100%;
 	}
 }
 
 #refresh_bottom {
+	justify-self: flex-end;
+	grid-row: 1;
+	grid-column: 1;
+	align-self: flex-end;
 	align-content: end;
+	/*! justify-content: end; */
 }
 
 @media (max-aspect-ratio: 3/4) {
@@ -212,6 +231,10 @@ html, body {
 		width: clamp(2rem, 11vw, 8rem);
 		height: clamp(2rem, 11vw, 8rem);
 		padding-top: 0.1rem;
+		grid-column: 1;
+		grid-row: 2;
+		justify-self: flex-start;
+		align-self: flex-start;
 	}
 }
 
@@ -235,9 +258,12 @@ html, body {
 }
 
 #message_ui {
-	width: calc(100% - 0.5rem);
 	display: grid;
 	grid-template-columns: max-content 1fr 4em;
+	width: 100%;
+	/*! box-sizing: border-box; */
+	/*! max-width: 100%; */
+	/*! min-width: 0; */
 }
 
 @media (max-aspect-ratio: 3/4) {
@@ -267,7 +293,9 @@ html, body {
 
 #message {
 	font-size: inherit;
-	width: 30vh;
+	box-sizing: border-box;
+	width: 100%;
+	min-width: 0;
 }
 
 @media (max-aspect-ratio: 3/4) {
@@ -279,4 +307,6 @@ html, body {
 
 #send {
 	font-size: inherit;
+	margin-left: 0.2em;
 }
+

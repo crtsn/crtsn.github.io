@@ -31,7 +31,7 @@ window.db_promise = initSqlJs({ locateFile: file => `/${file}` }).then(function(
 function send_message() {
 	var new_message = window.carrot_generate(message.value);
 	response.innerHTML = new_message;
-	if (!ignore_toggle.classList.contains('enabled')) {
+	if (ignore_toggle.classList.contains('enabled')) {
 		window.feed_carrot(message.value);
 		message.value = "";
 	}
@@ -46,10 +46,10 @@ function toggle_ignore()
 		ignore_toggle.classList.remove("enabled");
 	}
 	if (ignore_toggle.classList.contains('enabled')) {
-		ignore_toggle.title = "Not ignore: carrot will eat your message; (I)"
+		ignore_toggle.title = "Click to not ignore: carrot will eat your message; (I)"
 	}
 	else {
-		ignore_toggle.title = "Ignore: carrot will not eat your message; (I)"
+		ignore_toggle.title = "Click to ignore: carrot will not eat your message; (I)"
 	}
 }
 
@@ -81,6 +81,22 @@ window.onload = function () {
 
 	send.onclick = send_message;
 	toggle_ignore();	
+
+	// Hack for firefox on android, because for me it lefts blue rectangle and page stucks after virtual keyboard closes
+	document.querySelectorAll('input, textarea').forEach((input) => {
+		input.addEventListener('blur', () => {
+			setTimeout(() => {
+				window.scrollTo(0, 0);
+
+				// reflow
+				const body = document.body;
+				const originalDisplay = body.style.display;
+				body.style.display = 'none';
+				body.offsetHeight; 
+				body.style.display = originalDisplay;
+			}, 150);
+		});
+	});
 }
 document.addEventListener("DOMContentLoaded", function(event) {
 	console.log("DOMContentLoaded");
@@ -102,4 +118,5 @@ window.onkeydown = e => {
 			break
     }
 }
+
 
