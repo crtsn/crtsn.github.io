@@ -16,18 +16,31 @@
     <body>
 		<div id="garden">
 		</div>
-		<div id="carrot">
-			<img id="face" src="/images/carrot.svg">
-			<img id="mouth" src="/images/happy_mouth.png">
-			<svg id="triangle" preserveAspectRatio="none" viewBox="0 0 50 50">
-				<polygon points="00,0 30,0 50,50"></polygon>
-			</svg>
-			<div id="message_ui">
-				<div id="refresh_bottom" title="Regenerate (R)">
-					<img id="refresh" src="/images/refresh.svg">
+		<div id="everything_center">
+			<div id="everything">
+				<div id="messaging">
+					<div id="response_ui">
+						<div id="refresh_bottom" title="Regenerate (R)">
+							<img id="refresh" src="/images/refresh.svg" draggable="false">
+						</div>
+						<div id="response">
+							<noscript>PLEASE ENABLE JS!</noscript>
+						</div>
+					</div>
+					<div id="triangle_row">
+						<svg id="triangle" preserveAspectRatio="none" viewBox="0 0 50 50">
+							<polygon points="00,0 30,0 50,50"></polygon>
+						</svg>
+					</div>
 				</div>
-				<div id="message">
-					<noscript>PLEASE ENABLE JS!</noscript>
+				<div id="carrot">
+					<img id="body" src="/images/carrot.svg" draggable="false">
+					<img id="mouth" src="/images/happy_mouth.png" draggable="false">
+				</div>
+				<div id="message_ui">
+					<span id="ignore_toggle" title="Ignore: carrot will not eat your message; (I)">!carrot</span>
+					<input type="text" id="message" autocomplete="off" value="">
+					<button id="send" title="Send (Enter)">Send</button>
 				</div>
 			</div>
 		</div>
