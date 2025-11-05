@@ -64,6 +64,7 @@ html, body {
 @media (max-aspect-ratio: 3/4) {
 	#everything_center { 
 		bottom: 0;
+		height: 100vh;
 	}
 }
 
@@ -74,10 +75,18 @@ html, body {
 
 @media (max-aspect-ratio: 3/4) {
 	#everything { 
-		grid-template-rows: 1fr max-content 3rem;
+		grid-template-rows: auto fit-content(20rem) 3rem;
 		grid-template-columns: unset;
 		width: 100%;
+		height: 100vh;
 	}
+}
+
+#carrot_scroll {
+  overflow-y: scroll;
+  height: 100%;
+  justify-content: center;
+  display: grid;
 }
 
 #carrot {
@@ -90,8 +99,10 @@ html, body {
 
 @media (max-aspect-ratio: 3/4) {
 	#carrot { 
-		width: clamp(6rem,21vmax,15rem);
+		max-width: clamp(6rem,20vmax,15rem);
 		justify-self: center;
+		height: 100%;
+		width: auto;
 	}
 }
 
@@ -309,4 +320,5 @@ html, body {
 	font-size: inherit;
 	margin-left: 0.2em;
 }
+
 
