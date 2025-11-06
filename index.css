@@ -7,7 +7,7 @@ html, body {
 	width: 100%;
 	font-size: 16pt;
 	position: fixed;
-	height: 100dvh;
+	height: 100%;
 }
 
 @media (min-aspect-ratio: 3/4) {
@@ -64,7 +64,7 @@ html, body {
 @media (max-aspect-ratio: 3/4) {
 	#everything_center { 
 		bottom: 0;
-		height: 100dvh;
+		height: 100%;
 	}
 }
 
@@ -78,7 +78,7 @@ html, body {
 		grid-template-rows: auto fit-content(20rem) 3rem;
 		grid-template-columns: unset;
 		width: 100%;
-		height: 100dvh;
+		height: 100%;
 	}
 }
 
@@ -167,11 +167,11 @@ html, body {
 @media (max-aspect-ratio: 3/4) {
 	#triangle { 
 		--width: calc(20vw);
-		--height: calc(8.5dvh);
+		--height: calc(8.5vh);
 		--ratio: calc( tan( atan2(var(--width), var(--height)) ) );
 		--angle: calc( atan(var(--ratio)) );
 		right: 50%;
-		bottom: 41dvh;
+		bottom: 41vh;
 		width: var(--width);
 		height: var(--height);
 		transform: skewX(calc( -0.8 * var(--angle) ) );
