@@ -97,6 +97,17 @@ window.onload = function () {
 			}, 150);
 		});
 	});
+
+	setTimeout(() => {
+		window.scrollTo(0, 0);
+
+		// reflow
+		const body = document.body;
+		const originalDisplay = body.style.display;
+		body.style.display = 'none';
+		body.offsetHeight; 
+		body.style.display = originalDisplay;
+	}, 150);
 }
 document.addEventListener("DOMContentLoaded", function(event) {
 	console.log("DOMContentLoaded");
