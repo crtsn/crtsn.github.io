@@ -62,7 +62,9 @@ window.onload = function () {
 	    cday.setFullYear(cday.getFullYear() + 1);
 	}  
 	var one_day = 1000 * 60 * 60 * 24;
-	subtitle.innerHTML += Math.ceil((cday.getTime() - today.getTime()) / (one_day)) + " days left"
+	next_cday_msg = Math.ceil((cday.getTime() - today.getTime()) / (one_day)) + " days left";
+	console.log(next_cday_msg);
+	// subtitle.innerHTML = next_cday_msg;
 
 	refresh.onclick = e => {
 		var new_message = window.carrot_generate();
